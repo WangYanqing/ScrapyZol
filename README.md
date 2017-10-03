@@ -1,2 +1,3 @@
 # ScrapyZol
-Use scrapy to scratch the hottest phones' infomation
+Use python scrapy to scratch the hottest phones' infomation.
+
