@@ -16,6 +16,19 @@ class PhonespiderSpider(scrapy.Spider):
     folder = 'phonesImg'
     items = []
 
+    keyMap = {
+    unicode('上市日期', 'utf-8') : 'onSaleDate',
+    unicode('主屏尺寸', 'utf-8') : 'screenSize',
+    unicode('主屏分辨率', 'utf-8') : 'resolution',
+    unicode('操作系统', 'utf-8') : 'osName',
+    unicode('核心数', 'utf-8') : 'nCpuCores',
+    unicode('CPU型号', 'utf-8') : 'cpuType',
+    unicode('CPU频率', 'utf-8') : 'cpuSpeed',
+    unicode('GPU型号', 'utf-8') : 'gpuType',
+    unicode('RAM容量', 'utf-8') : 'ram',
+    unicode('ROM容量', 'utf-8') : 'rom',
+    }
+
     def parse(self, response):
         if os.path.exists(self.folder) == False:
         	os.mkdir(self.folder)
@@ -28,9 +41,9 @@ class PhonespiderSpider(scrapy.Spider):
             item = PhoneItem()
             item['_id']    = self._id
             self._id = self._id + 1
-        	
 
-            #img src 
+
+            #img src
             imgStr = phone.xpath('a[@class="pic"]/img').extract_first()
             # print('------img=%s' % imgStr)
             m = re.match('.+ \.src="(\S+)".+', imgStr)
@@ -42,10 +55,11 @@ class PhonespiderSpider(scrapy.Spider):
         	# print(self.item)
 
             url = response.urljoin(phone.xpath('a/@href').extract_first())
+            item['url'] = url
             request =  scrapy.Request(url, callback = self.parseDetail)
             request.meta['item'] = copy.deepcopy(item)
             yield request
-        
+
         nodeNext = response.xpath('//div[@class="page-box"]//a[@class="next"]/@href').extract_first()
         # print('----------==========', nodeNext)
         if nodeNext:
@@ -81,13 +95,28 @@ class PhonespiderSpider(scrapy.Spider):
         item['imgSrc']      = metaItem['imgSrc']
         item['desp']        = metaItem['desp']
         item['price']       = metaItem['price']
+        item['url']       = metaItem['url']
 
     	item['screenSize'] 	= node.xpath('p[1]/@title').extract_first()
     	item['resolution'] 	= node.xpath('p[2]/@title').extract_first()
     	item['name']		= response.xpath('//div[@class="version-series"]/span/text()').extract_first()
 
+        paramTables = response.xpath('//div[@id="paramTable"]/div[@id="newTb"]/table')
 
-    	# print(item['imgSrc'])
-    	
-    	urllib.urlretrieve(item['imgSrc'], os.path.join(self.folder, ('%d.png' % item['_id'])))
+        #Get the params
+        for pt in paramTables:
+            liNodes = pt.xpath('.//ul[@class="category-param-list"]/li')
+            for ln in liNodes:
+                tag = ln.xpath('span[1]/text()').extract_first().strip()
+                val = ln.xpath('span[2]/text()').extract_first()
+                if val == None:
+                    val = ln.xpath('span[2]/a/text()').extract_first()
+                # print('%s : %s' % (tag, val))
+                if self.keyMap.has_key(tag):
+                    item[self.keyMap[tag]] = val
+
+        # print(item)
+
+        # Scratch the phone image
+    	# urllib.urlretrieve(item['imgSrc'], os.path.join(self.folder, ('%d.png' % item['_id'])))
     	yield item
