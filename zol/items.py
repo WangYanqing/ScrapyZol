@@ -31,3 +31,17 @@ class PhoneItem(scrapy.Item):
     gpuType     = scrapy.Field()
     ram         = scrapy.Field()
     rom         = scrapy.Field()
+
+
+class CarItem(scrapy.Item):
+    name0       = scrapy.Field()    #名字，型号名
+    name1       = scrapy.Field()    #名字，型号下面的分支，不同配置
+    alpha       = scrapy.Field()    #品牌首字母，用于索引查询
+    brand       = scrapy.Field()    #品牌
+    factory     = scrapy.Field()    #厂商
+    price       = scrapy.Field()    #厂商指导价
+    level       = scrapy.Field()    #级别
+    energy      = scrapy.Field()    #能源类型
+    onSaleTime  = scrapy.Field()    #上市时间
+    engine      = scrapy.Field()    #发动机
+
