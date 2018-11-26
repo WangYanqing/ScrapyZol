@@ -3,6 +3,7 @@
 import scrapy
 from zol.items import *
 import copy
+import re
 
 
 class CarSpider(scrapy.Spider):
@@ -90,7 +91,11 @@ class CarSpider(scrapy.Spider):
         # if nodeTypes == None or len(nodeTypes) <= 0:
         #     return
         print '==types.len=%d' % len(nodeTypes.xpath('//tbody'))
+        data0 = nodeTypes[0].xpath('//comment()').re(r'<!--(.*)-->')[0]
+        print unicode(data0)
         print '===============parseDetail 2'
 
         for nType in nodeTypes:
             print '-=-= %s' % nType.xpath('text()')[0]
+
+        print '===============parseDetail 3'

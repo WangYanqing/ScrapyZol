@@ -45,3 +45,18 @@ class CarItem(scrapy.Item):
     onSaleTime  = scrapy.Field()    #上市时间
     engine      = scrapy.Field()    #发动机
 
+
+class DrugItem(scrapy.Item):
+    drug        = scrapy.Field()
+    drugUrl     = scrapy.Field()
+    drugGroup   = scrapy.Field()
+    gene        = scrapy.Field()
+    geneUrl     = scrapy.Field()
+    geneId      = scrapy.Field()
+    geneIdUrl   = scrapy.Field()
+    change      = scrapy.Field()
+    interaction = scrapy.Field()
+    chromosome  = scrapy.Field()
+    references  = scrapy.Field()
+    refUrl      = scrapy.Field()
+
