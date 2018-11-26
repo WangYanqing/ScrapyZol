@@ -4,6 +4,7 @@ import scrapy
 from zol.items import *
 import copy
 import re
+from scrapy_splash import SplashRequest
 
 
 class CarSpider(scrapy.Spider):
@@ -54,7 +55,8 @@ class CarSpider(scrapy.Spider):
                         item['factory']    = nodeFactories[i - 1]
                         item['name0']      = carName
 
-                        request = scrapy.Request(url, callback = self.parseCarHome)
+                        # request = scrapy.Request(url, callback = self.parseCarHome)
+                        request = SplashRequest(url, callback = self.parseCarHome)
                         request.meta['item'] = copy.deepcopy(item)
                         yield request
                         j += 1
@@ -75,7 +77,8 @@ class CarSpider(scrapy.Spider):
             name = nodeNav[0].xpath('text()').extract_first()
             # print '          %s %s' % (url0, name)
             print '----parseCarHome 1 ' + url0
-            request = scrapy.Request(url0, callback = self.parseDetail)
+            # request = scrapy.Request(url0, callback = self.parseDetail)
+            request = SplashRequest(url0, callback = self.parseDetail)
             request.meta['item'] = copy.deepcopy(response.meta['item'])
 
             yield request
@@ -85,17 +88,19 @@ class CarSpider(scrapy.Spider):
 
     def parseDetail(self, response):
         print '===============parseDetail 1'
-        nodeTypes = response.xpath('//*[@id="config_nav"]')
+        nodeTypes = response.xpath('//*[@id="config_nav"]/table')
         # nodeTypes = response.xpath('//div[@class="operation" and @id="config_nav"]/table/tbody')
         # nodeTypes = response.xpath('//div[@id="content" and @class="pzbox"]/div/table/tbody/tr/td[1]/div[2]/div/a')
         # if nodeTypes == None or len(nodeTypes) <= 0:
         #     return
-        print '==types.len=%d' % len(nodeTypes.xpath('//tbody'))
-        data0 = nodeTypes[0].xpath('//comment()').re(r'<!--(.*)-->')[0]
-        print unicode(data0)
+        # print '==types.len=%d' % len(nodeTypes[0].xpath('table'))
+        # data0 = nodeTypes[0].xpath('//comment()').re(r'<!--(.*)-->')[0]
+        # print unicode(data0)
+        print nodeTypes
         print '===============parseDetail 2'
 
-        for nType in nodeTypes:
-            print '-=-= %s' % nType.xpath('text()')[0]
+        cols = nodeTypes.xpath('//div[@class="carbox"]/div/a')
+        for c in cols:
+            print '-=-= %s' % c.xpath('string()').extract_first()
 
         print '===============parseDetail 3'
